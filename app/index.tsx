@@ -10,7 +10,9 @@ import LabeledTextInput from "@/components/LabeledTextInput";
 import GetData from "@/api/getData";
 import { onValue } from 'firebase/database';
 import { randomUUID } from 'expo-crypto'
-import RoundButton from "@/components/roundButton";
+import RoundButton from "@/components/RoundButton";
+
+
 
 
 import {
@@ -21,47 +23,6 @@ import {
   Text,
   StatusBar,
 } from "react-native";
-
-
-
-
-
-// MUST DELETE
-// const lp = [
-//   {
-//     id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-//     name: "First Item",
-//     phone: 968763903,
-//     loanAmount: 30,
-//     loanPeriod: "1 month",
-//     interestRate: "30%",
-//     payback: 30,
-//     lentOn: "16th, June 2024",
-//     dueOn: "16th, July 2024",
-//   },
-//   {
-//     id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-//     name: "Second Item",
-//     phone: 968763903,
-//     loanAmount: 30,
-//     loanPeriod: "1 month",
-//     interestRate: "30%",
-//     payback: 30,
-//     lentOn: "16th, June 2024",
-//     dueOn: "16th, July 2024",
-//   },
-//   {
-//     id: "58694a0f-3da1-471f-bd96-145571e29d72",
-//     name: "Third Item",
-//     phone: 968763903,
-//     loanAmount: 3000,
-//     loanPeriod: "1 month",
-//     interestRate: "30%",
-//     payback: 3000,
-//     lentOn: "16th, June 2024",
-//     dueOn: "16th, July 2024",
-//   },
-// ];
 
 interface Client {
   id: string;
@@ -74,44 +35,6 @@ interface Client {
   loanAmount: number;
   phone: number;
 }
-
-
-  // Get a database reference to our posts
-let dataArray:any
-  const dbRef = ref(db, 'clients');
-  let response:any
-  // Attach an asynchronous callback to read the data at our posts reference
-   onValue(dbRef, (snapshot) => {
-  response = snapshot.val()
-  console.log('response', response);
-  }, (errorObject) => {
-  console.log('The read failed: ' + errorObject.name);
-  });
-  
-  console.log("my response", response)
-  
-  if(response){
-
-   dataArray = Object.values(response)?.map((obj:any) => ({
-    id: obj?.id,
-    dueOn: obj?.dueOn,
-    firstName: obj?.firstName,
-    interestRate: obj?.interestRate,
-    loanPeriod: obj?.laonPeriod,
-    lastName: obj?.lastame,
-    lentOn: obj?.lentOn,
-    loanAmount: obj?.loanAmount,
-     phone: obj?.phone
-     }));
-
-    }
-
-    else console.log("response is undefined")
-
-
-console.log("me",dataArray)
-
-
  
 function Index() {
 
@@ -129,43 +52,44 @@ function Index() {
 
   // get data from firebase as an array of objects
 
-  // useEffect( ()=>{
-  //   // Get a database reference to our posts
+  useEffect( ()=>{
+    // Get a database reference to our posts
+    const dbRef = ref(db, 'clients');
+    let response:any
+    // Attach an asynchronous callback to read the data at our posts reference
+     onValue(dbRef, (snapshot) => {
+    response = snapshot.val()
+    console.log(response);
+    if(response){
+
+      let dataArray = Object.values(response)?.map((obj:any) => ({
+        id: obj?.id,
+        dueOn: obj?.dueOn,
+        firstName: obj?.firstName,
+        interestRate: obj?.interestRate,
+        loanPeriod: obj?.laonPeriod,
+        lastName: obj?.lastame,
+        lentOn: obj?.lentOn,
+        loanAmount: obj?.loanAmount,
+         phone: obj?.phone
+         }));
   
-  //   const dbRef = ref(db, 'clients');
-  //   let response:any
-  //   // Attach an asynchronous callback to read the data at our posts reference
-  //    onValue(dbRef, (snapshot) => {
-  //   response = snapshot.val()
-  //   console.log(response);
-  //   }, (errorObject) => {
-  //   console.log('The read failed: ' + errorObject.name);
-  //   });
+         setData(dataArray)
+        }
+
+        else console.log("response is undefined")
+
+    }, (errorObject) => {
+    console.log('The read failed: ' + errorObject.name);
+    });
     
-  //   console.log("my response", response)
+    console.log("my response", response)
     
-  //   if(response){
 
-  //   let dataArray = Object.values(response)?.map((obj:any) => ({
-  //     id: obj?.id,
-  //     dueOn: obj?.dueOn,
-  //     firstName: obj?.firstName,
-  //     interestRate: obj?.interestRate,
-  //     loanPeriod: obj?.laonPeriod,
-  //     lastName: obj?.lastame,
-  //     lentOn: obj?.lentOn,
-  //     loanAmount: obj?.loanAmount,
-  //      phone: obj?.phone
-  //      }));
-
-  //      setData(dataArray)
-  //     }
-
-  //     else console.log("response is undefined")
   
   
-  // console.log("me",data)
-  // }, [])
+  console.log("me",data)
+  }, [])
   
   
   const AddClient = () => {
@@ -193,14 +117,26 @@ function Index() {
     setLentOn('')
     setDueOn('')
   }
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // callback to handle button press
+  const handleOpenBottomSheet = useCallback(() => {
+    bottomSheetRef.current?.expand();
+  }, []);
+
   return (
     <>
-    {console.log('my data',dataArray)}
+    {console.log('my data',data)}
       <GestureHandlerRootView style={{ flex: 1 }}>
     <SafeAreaView style={styles.container}>
-      <RoundButton/>
+      <Pressable style={styles.roundButton}
+             onPress={handleOpenBottomSheet}
+             
+            >
+                </Pressable>
       <FlatList
-        data={dataArray}
+        data={data}
         renderItem={({ item }) => (
           <Card
             name={item.firstName}
@@ -215,8 +151,10 @@ function Index() {
         keyExtractor={(item) => item.id}
         />
     
-     {/* <BottomSheet style={{padding: 11}} snapPoints={snapPoints}
+      <BottomSheet style={{padding: 11}} snapPoints={snapPoints}
      enablePanDownToClose={true}
+     index={-1}
+     ref={bottomSheetRef}
      >
       <BottomSheetView >
 
@@ -291,7 +229,7 @@ function Index() {
        
           
       </BottomSheetView>
-    </BottomSheet> */}
+    </BottomSheet>
     </SafeAreaView>
     </GestureHandlerRootView>
   
@@ -361,7 +299,8 @@ button:{
     marginTop:35,
     marginHorizontal: 15,
     borderRadius:12,
-    paddingVertical:4,    
+    paddingVertical:4,
+    zIndex: 99    
   },
   row: {
     flexDirection: 'row',
@@ -374,6 +313,18 @@ button:{
     flex: 1,
     marginRight: 10, // Adjust spacing between the input fields
   },
+  roundButton: {
+    height: 70,
+    width:70,
+    backgroundColor:'#F4CE14',
+    marginHorizontal: 15,
+    borderRadius:50,
+    paddingVertical:4,
+    position: 'absolute',
+    zIndex: 1,
+    bottom: 20,
+    right: 20,
+  }
 });
 
 export default Index;
