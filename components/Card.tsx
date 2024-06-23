@@ -6,7 +6,7 @@ interface CardInterface {
   phone: number,
   loanAmount: number,
   loanPeriod: string,
-  interestRate: string,
+  interestRate: number,
   lentOn: string,
   dueOn: string,
 }
