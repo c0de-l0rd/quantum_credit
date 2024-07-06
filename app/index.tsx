@@ -10,7 +10,9 @@ import LabeledTextInput from "@/components/LabeledTextInput";
 import GetData from "@/api/getData";
 import { onValue } from 'firebase/database';
 import { randomUUID } from 'expo-crypto'
-import RoundButton from "@/components/RoundButton";
+import {Picker} from '@react-native-picker/picker';
+import { Dropdown } from 'react-native-element-dropdown';
+import { MdOutlineFilterList } from "react-icons/md";
 
 
 
@@ -35,6 +37,13 @@ interface Client {
   loanAmount: number;
   phone: number;
 }
+
+const modalData = [
+  { label: 'Item 1', value: '1' },
+  { label: 'Item 2', value: '2' },
+  { label: 'Item 3', value: '3' },
+  { label: 'Item 4', value: '4' },
+];
  
 function Index() {
 
@@ -51,7 +60,14 @@ function Index() {
 
     const [searchText, setSearchText] = useState('');
 
-  const snapPoints = useMemo(()=> ['25%', '100%'], [])
+    const [filterValue, setFilterValue] = useState();
+
+    const [value, setValue] = useState(null);
+
+    const [isOpen, setIsOpen] = useState(false);
+
+
+  const snapPoints = useMemo(()=> ['100%'], [])
 
   // get data from firebase as an array of objects
 
@@ -125,6 +141,15 @@ function Index() {
     bottomSheetRef.current?.expand();
   }, []);
 
+  const handleSheetChange = (index:any) => {
+    console.log(`BottomSheet index: ${index}`);
+    if (index === -1) {
+      setIsOpen(false);
+    } else {
+      setIsOpen(true);
+    }
+  };
+
   const searchFunction = () => {
 
     let updatedData = dataCopy?.filter((item) => {
@@ -159,9 +184,10 @@ function Index() {
     {console.log('my data',data)}
       <GestureHandlerRootView style={{ flex: 1 }}>
     <SafeAreaView style={styles.container}>
-      <Pressable style={styles.roundButton}
+
+      {isOpen ? null : <Pressable style={styles.roundButton}
              onPress={handleOpenBottomSheet}>
-                </Pressable>
+                </Pressable> }
 
                 <View style={styles.searchBar}>
                 <TextInput
@@ -174,11 +200,16 @@ function Index() {
               onChangeText={setSearchText}
               value={searchText}
               />
-              <Pressable style={{marginStart: 240, position:'absolute', marginTop:6,  zIndex:99, }}
+              <Pressable style={{marginStart: 240, position:'absolute', marginTop:6, }}
              onPress={clearSearchBar}>
               <Text style={{fontWeight: 'bold', fontSize: 18}}>X</Text>
                 </Pressable>
+
               </View>
+
+            
+
+  
       <FlatList
         data={data}
         renderItem={({ item }) => (
@@ -196,6 +227,7 @@ function Index() {
         />
     
       <BottomSheet style={{padding: 11}} snapPoints={snapPoints}
+    onChange={handleSheetChange}
      enablePanDownToClose={true}
      index={-1}
      ref={bottomSheetRef}
@@ -344,7 +376,7 @@ button:{
     marginHorizontal: 15,
     borderRadius:12,
     paddingVertical:4,
-    zIndex: 99    
+      
   },
   row: {
     flexDirection: 'row',
@@ -377,7 +409,7 @@ button:{
     backgroundColor: "grey",
     marginBottom: 30,
     marginTop: 30,
-    marginHorizontal: 'auto',
+    marginHorizontal:'auto',
     paddingStart: 10
     
     
