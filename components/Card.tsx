@@ -1,11 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 
 interface CardInterface {
   name: string,
   phone: number,
   loanAmount: number,
-  loanPeriod: string,
   interestRate: number,
   lentOn: string,
   dueOn: string,
@@ -15,16 +14,19 @@ function Card({
   name,
   phone,
   loanAmount,
-  loanPeriod,
   interestRate,
   lentOn,
   dueOn,
 }: CardInterface) {
+
+      // TODO : add calculation for loan period
+      // const loanPeiod = () => {}
+
   return (
     <View style={styles.card}>
       <Text>{name}</Text>
       <Text>{phone}</Text>
-      <Text style={styles.details}>K{loanAmount} at {interestRate} for {loanPeriod}</Text>
+      <Text style={styles.details}>K{loanAmount} at {interestRate} for {/*period*/}</Text>
       <Text style={styles.payback}>Payback: K 900</Text>
       <View style={styles.dates}>
       <Text style={styles.dateText}>lent on: {lentOn}</Text>
